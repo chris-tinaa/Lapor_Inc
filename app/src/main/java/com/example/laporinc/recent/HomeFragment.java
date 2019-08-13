@@ -184,7 +184,6 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
             private void isScrollCompleted() {
 
                 if (totalItem - currentFirstVisibleItem == currentVisibleItemCount && this.currentScrollState == SCROLL_STATE_IDLE) {
-                    /** To do code here*/
 
                     //Log.i("totalItem", Integer.toString( totalItem ));
                     //Log.i("currentFirstVisibleItem", Integer.toString( currentFirstVisibleItem ));
