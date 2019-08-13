@@ -1,28 +1,29 @@
-package com.example.laporinc.recent;
+package com.example.laporinc.laporansaya;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.laporinc.MainActivity;
 import com.example.laporinc.R;
+import com.example.laporinc.recent.Post;
+import com.example.laporinc.recent.PostListAdapter;
 import com.example.laporinc.reportdetail.ReportDetailActivity;
 import com.example.laporinc.user.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,77 +38,59 @@ import java.util.ArrayList;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 
-public class HomeFragment extends Fragment implements PostListAdapter.ItemClickListener, PostListAdapter.GenericItemClickListener, MainActivity.PassMethod {
+public class LaporanActivity extends AppCompatActivity {
 
     private static final Object LOCK = new Object();
     private Object lock = LOCK;
 
     private PostListAdapter adapter;
-    private Intent intent;
     private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
     private ArrayList<String> keys;
-    private String namaUser;
-    private int poin;
     private ArrayList<Post> posts;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private Long oldestPost;//4th data
-    private Toolbar actionBar;
-    private TextView userName;
-    private TextView userPoin;
     private LinearLayoutManager layoutManager;
     private FirebaseUser user;
     private String userId;
     private PostListAdapter.ItemClickListener rv_listener;
-    private RecyclerView.SmoothScroller smoothScroller;
     private SwipeRefreshLayout swipeRefreshLayout;
     //private View actionBarLayout;
 
     private Handler mainThreadHandler;
-    private Thread setActionBarThread;
-    private Thread loadDataThread;
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate( R.layout.fragment_home, container, false );
-        //View actionBarLayout = inflater.inflate( R.layout.home_action_bar, container, false );
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_laporan );
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
-        progressBar = (ProgressBar) view.findViewById( R.id.progressBar );
+        progressBar = (ProgressBar) findViewById( R.id.progressBar2 );
         keys = new ArrayList<>();
-        recyclerView = (RecyclerView) view.findViewById( R.id.recyclerView );
+        recyclerView = (RecyclerView) findViewById( R.id.rv_laporan );
         posts = new ArrayList<>();
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById( R.id.swipeRefreshLayout );
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById( R.id.swipeRefreshLayout2 );
 
         // on Recycler View item click
         rv_listener = new PostListAdapter.ItemClickListener() {
             @Override
-            public void onItemClicked(RecyclerView.ViewHolder viewHolder, Object item, int position) {
-                //Toast.makeText(getActivity(), "Item clicked: " + position, Toast.LENGTH_SHORT).show();
-                Log.i( Integer.toString( position ), keys.get( position ) );
+            public void onItemClicked(RecyclerView.ViewHolder vh, Object item, int pos) {
+                Log.i( Integer.toString( pos ), keys.get( pos ) );
 
-                Intent intent = new Intent( getActivity(), ReportDetailActivity.class );
+                Intent intent = new Intent( LaporanActivity.this, ReportDetailActivity.class );
                 startActivity( intent );
             }
         };
 
         // adapter for recycler view
-        adapter = new PostListAdapter( posts, getContext(), rv_listener );
+        adapter = new PostListAdapter( posts, this, rv_listener );
         recyclerView.setAdapter( adapter );
 
-        // smooth scrolling to top
-        smoothScroller = new LinearSmoothScroller( getActivity() ) {
-            @Override
-            protected int getVerticalSnapPreference() {
-                return LinearSmoothScroller.SNAP_TO_START;
-            }
-        };
 
         // Layout Manager for recycler view
-        layoutManager = new LinearLayoutManager( getActivity() );
+        layoutManager = new LinearLayoutManager( this );
         layoutManager.setOrientation( LinearLayoutManager.VERTICAL );
         // reverse order ==================================================
         //((LinearLayoutManager) layoutManager).setReverseLayout( true );
@@ -120,15 +103,6 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
         user = mAuth.getCurrentUser();
         userId = user.getUid();
 
-
-        // Custom Action Bar
-        actionBar = (Toolbar) view.findViewById( R.id.actionBar );
-        userName = (TextView) view.findViewById( R.id.tv_username );
-        userPoin = (TextView) view.findViewById( R.id.tv_point );
-
-        // ambil nama dan poin untuk actionbar
-        getUserData();
-
         // mengambil data postingan
         getPosts();
 
@@ -137,17 +111,12 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
         mainThreadHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                if (msg.what == 1) {
-                    // Update view component text, this is allowed.
-                    ((AppCompatActivity) getActivity()).setSupportActionBar( actionBar );
-                    userName.setText( namaUser );
-                    userPoin.setText( Integer.toString( poin ) );
-                } else if (msg.what == 2) {
+                if (msg.what == 2) {
                     progressBar.setVisibility( View.GONE );
                     adapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
+                    swipeRefreshLayout.setRefreshing( false );
                 } else if (msg.what == 3) {
-                    Toast.makeText( getActivity(), "Sudah di akhir halaman", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( LaporanActivity.this, "Sudah di akhir halaman", Toast.LENGTH_SHORT ).show();
                 }
 
             }
@@ -213,6 +182,7 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                                             continue;
                                         }
 
+
                                         String key = child.getKey();
                                         String idPelapor = post.getIdPelapor();
                                         String lokasi = post.getLokasi();
@@ -225,14 +195,13 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
 
                                         oldestPost = post.getOrder();
 
-                                        if (status.equals(MainActivity.STATUS_PROCESSED  ) ) {
-                                            postItem = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
-                                            posts.add( postItem );
-                                            keys.add( key );
-                                        }
+                                        postItem = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
+                                        posts.add( postItem );
+                                        keys.add( key );
+
                                     }
 
-                                    if (oldestPost == 0){
+                                    if (oldestPost == 0) {
                                         Message message = new Message();
                                         message.what = 3;
                                         //message.arg1 = i;
@@ -272,22 +241,6 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
         } );
 
 
-        return view;
-    }
-
-
-    @Override
-    public void onItemClicked(RecyclerView.ViewHolder vh, Object item, int pos) {
-
-    }
-
-    // tes
-    public void goToTop() {
-        //LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        //layoutManager.scrollToPosition( posts.size() - 1 );
-        //layoutManager.scrollToPosition( 0 );
-        smoothScroller.setTargetPosition( 0 );
-        layoutManager.startSmoothScroll( smoothScroller );
     }
 
 
@@ -314,6 +267,8 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                         for (DataSnapshot postSnapshot : snapshot.getChildren()) {
 
                             Post post = postSnapshot.getValue( Post.class );
+                            //Log.e( "Get Data", post.getLokasi());
+
 
                             String key = postSnapshot.getKey();
                             String idPelapor = post.getIdPelapor();
@@ -328,12 +283,16 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
 
                             oldestPost = post.getOrder();
 
-                            if (status.equals(MainActivity.STATUS_PROCESSED  ) ) {
+                            Log.i( "outside if", status );
+                            Log.i( "STATUS_PROCESSED", MainActivity.STATUS_PROCESSED );
 
-                                post = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
-                                posts.add( post );
-                                keys.add( key );
-                            }
+
+                            Log.i( "inside if", status );
+
+                            post = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
+                            posts.add( post );
+                            keys.add( key );
+
                         }
 
                         Message message = new Message();
@@ -357,39 +316,20 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
     }
 
 
-    private void getUserData() {
+    // mengatur action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate( R.menu.close_icon, menu );
 
-        databaseReference.child( "users" ).child( userId ).addValueEventListener( new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
+        return super.onCreateOptionsMenu( menu );
+    }
 
-                new Thread( new Runnable() {
+    // respon onclick icon "close" di action bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        onBackPressed();
 
-                    @Override
-                    public void run() {
-
-                        User user = dataSnapshot.getValue( User.class );
-                        //homeFragment.setNamaUser( user.getNama() );
-                        namaUser = user.getNama();
-                        poin = user.getPoin();
-
-
-
-                        Message message = new Message();
-                        message.what = 1;
-                        //message.arg1 = i;
-                        mainThreadHandler.sendMessage( message );
-
-                    }
-                } ).start();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-
-
-        } );
+        return super.onOptionsItemSelected( item );
     }
 }

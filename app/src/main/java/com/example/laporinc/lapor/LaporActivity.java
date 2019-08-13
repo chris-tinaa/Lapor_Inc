@@ -50,6 +50,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.laporinc.MainActivity;
 import com.example.laporinc.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -88,7 +89,7 @@ public class LaporActivity extends AppCompatActivity {
     private Intent intent;
     private Geocoder geocoder;
     private DatabaseReference databaseReference;
-    private String address, lokasiKejadian, deskripsiKejadian, waktuKejadian, jenisPelanggaran, waktuKejadian_v2, imageKey, postKey, idUser, status;
+    private String address, lokasiKejadian, deskripsiKejadian, waktuKejadian, jenisPelanggaran, waktuKejadian_v2, imageKey, postKey, idUser;
     long order;
     private int imageCount;
     private boolean uploading = true;
@@ -293,7 +294,6 @@ public class LaporActivity extends AppCompatActivity {
         databaseReference.child( "posts" ).addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Log.i( "Count di lapor ", "" + snapshot.getChildrenCount() );
                 order = snapshot.getChildrenCount() * -1;
 
 
@@ -501,7 +501,6 @@ public class LaporActivity extends AppCompatActivity {
                     List<Address> listAddresses = geocoder.getFromLocation( location.getLatitude(), location.getLongitude(), 1 );
 
                     if (listAddresses != null && listAddresses.size() > 0) {
-                        //Log.i( "PlaceInfo", listAddresses.get( 0 ).toString() );
                         if (listAddresses.get( 0 ).getAddressLine( 0 ) != null) {
                             address = listAddresses.get( 0 ).getAddressLine( 0 );
                         }
@@ -559,8 +558,7 @@ public class LaporActivity extends AppCompatActivity {
                     List<Address> listAddresses = geocoder.getFromLocation( lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), 1 );
 
                     if (listAddresses != null && listAddresses.size() > 0) {
-                        //Log.i( "PlaceInfo", listAddresses.get( 0 ).toString() );
-                        if (listAddresses.get( 0 ).getAddressLine( 0 ) != null) {
+                       if (listAddresses.get( 0 ).getAddressLine( 0 ) != null) {
                             address = listAddresses.get( 0 ).getAddressLine( 0 );
                         }
                     }
@@ -667,42 +665,22 @@ public class LaporActivity extends AppCompatActivity {
         //status = "unverified";
         //key = databaseReference.push().getKey();
 
-        //Log.i( "Imagekey", "generated" );
-        imageKey = databaseReference.push().getKey();
+       imageKey = databaseReference.push().getKey();
 
         LaporActivity activity = new LaporActivity();
 //        OnUploadFinishListener mListener = new OnUploadFinishCallback();
 //        activity.registerOnUploadFinishListener( mListener );
-        //Log.i( "Masuk", "uploadFile" );
-
 
         postKey = databaseReference.push().getKey();
         idUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        status = "unverified";
 
 
-        UploadingInformationThread uploadingInformationThread = new UploadingInformationThread( lokasiKejadian, deskripsiKejadian, waktuKejadian, idUser, jenisPelanggaran, status, imageKey, postKey, order );
+        UploadingInformationThread uploadingInformationThread = new UploadingInformationThread( lokasiKejadian, deskripsiKejadian, waktuKejadian, idUser, jenisPelanggaran, MainActivity.STATUS_PENDING, imageKey, postKey, order );
         uploadingInformationThread.start();
 
 
         UploadingImageThread uploadingImageThread = new UploadingImageThread( this, bitmaps, imageKey, jenisPelanggaran, waktuKejadian_v2, lokasiKejadian );
         uploadingImageThread.start();
-
-
-        //BATAS SUCI
-        //activity.uploadFile( bitmaps, imageKey, databaseReference );
-
-//        // send to MainActivity
-//        intent.putExtra( "lokasi", lokasiKejadian );
-//        intent.putExtra( "deskripsi", deskripsiKejadian );
-//        intent.putExtra("date", waktuKejadian );
-//        intent.putExtra( "jenisPelanggaran", jenisPelanggaran );
-//        intent.putExtra( "imageKey", imageKey );
-//
-//
-//        setResult( 1, intent );
-//
-//        finish();
 
     }
 
@@ -717,11 +695,9 @@ public class LaporActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (intent.getExtras() == null) {
-            //Log.i( "sending data", "null" );
             setResult( 0, intent );
         } else {
             //udah diatur di public void lapor(View view)
-            //Log.i("sending data", "not null");
             //setResult(1,intent);
         }
     }

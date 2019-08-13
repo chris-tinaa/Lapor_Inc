@@ -1,5 +1,7 @@
 package com.example.laporinc.lapor;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -18,16 +20,27 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class UploadingImage implements Runnable {
+public class UploadingImageThread implements Runnable {
 
-    private Thread uploadingThread;
+//    private static final Object LOCK = new Object();
+//    private Object lock = LOCK;
+
+    private Context context;
+    private Thread uploadingImage;
     private ArrayList<Bitmap> bitmaps;
-    private String imageKey;
-    private String jenisPelanggaran;
-    private String waktuKejadian;
-    private String lokasiKejadian;
+    private String imageKey, jenisPelanggaran, waktuKejadian, lokasiKejadian;
 
-    public UploadingImage(ArrayList<Bitmap> bitmaps, String imageKey, String jenisPelanggaran, String waktuKejadian, String lokasiKejadian) {
+//    public static Object getLOCK() {
+//        return LOCK;
+//    }
+
+
+    public UploadingImageThread() {
+
+    }
+
+    public UploadingImageThread(Context context, ArrayList<Bitmap> bitmaps, String imageKey, String jenisPelanggaran, String waktuKejadian, String lokasiKejadian) {
+        this.context = context;
         this.bitmaps = bitmaps;
         this.imageKey = imageKey;
         this.jenisPelanggaran = jenisPelanggaran;
@@ -37,17 +50,17 @@ public class UploadingImage implements Runnable {
 
     @Override
     public void run() {
-        Log.i("UploadingImage", "Begin!");
+
+//        synchronized (lock) {
 
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         final int[] imageCount = {0};
 
-        String folderName = jenisPelanggaran + "/" +  waktuKejadian + "_" + lokasiKejadian;
+        String folderName = jenisPelanggaran + "/" + waktuKejadian + "_" + lokasiKejadian;
 
-        //Log.i( "Uploading", "START" );
 
-        for (final Bitmap bitmap : bitmaps) {
+        for (Bitmap bitmap : bitmaps) {
             final StorageReference imageRef = storage
                     .getReferenceFromUrl( "gs://laporinc.appspot.com/" )
                     .child( folderName + "/" + UUID.randomUUID() + ".jpeg" );
@@ -58,11 +71,6 @@ public class UploadingImage implements Runnable {
 
             UploadTask uploadTask = imageRef.putBytes( data );
 
-            if (imageRef == null){
-                Log.i("Imageref", "null");
-            }else {
-                Log.i("ImageRef", "not null");
-            }
 
             uploadTask.addOnFailureListener( new OnFailureListener() {
 
@@ -83,40 +91,38 @@ public class UploadingImage implements Runnable {
                     imageRef.getDownloadUrl().addOnSuccessListener( new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            //URIs.add( uri.toString() );
-                            //Log.i("uri", uri.toString() );
 
-                            if (imageKey == null){
-                                Log.i("imageKey", "null");
-                            }else {
-                                Log.i("imageKey", "not null");
-                            }
 
-                            Log.i( "Uploading", Integer.toString( imageCount[0] ) );
-
-                            databaseReference.child( "images" ).child( imageKey ).child( Integer.toString( imageCount[0] )).setValue( uri.toString() );
+                            databaseReference.child( "images" ).child( imageKey ).child( Integer.toString( imageCount[0] ) ).setValue( uri.toString() );
 
                             imageCount[0]++;
+
+                            if (imageCount[0] == bitmaps.size()) {
+                                 ((Activity)context).setResult( 1, null );
+                                ((Activity)context).finish();
+
+                            }
                         }
                     } );
                 }
             } );
 
 
+//            }
+
+//            lock.notifyAll();
+
         }
 
 
 
-        Log.i("UploadingImage", "Finish!");
-
 
     }
 
-    public void start(){
-        Log.i( "UploadingImageThread", "Starting" );
-        if (uploadingThread == null) {
-            uploadingThread = new Thread (this, "uploadingImage");
-            uploadingThread.start ();
+    public void start() {
+        if (uploadingImage == null) {
+            uploadingImage = new Thread( this, "uploadingImage" );
+            uploadingImage.start();
         }
     }
 }

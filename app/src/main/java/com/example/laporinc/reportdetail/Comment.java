@@ -1,10 +1,10 @@
 package com.example.laporinc.reportdetail;
 
-public class CommentModel {
+public class Comment {
 
     private String nama, waktu, isiKomentar;
 
-    public CommentModel(String nama, String waktu, String isiKomentar) {
+    public Comment(String nama, String waktu, String isiKomentar) {
         this.nama = nama;
         this.waktu = waktu;
         this.isiKomentar = isiKomentar;

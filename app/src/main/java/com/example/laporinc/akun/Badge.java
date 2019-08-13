@@ -1,10 +1,10 @@
 package com.example.laporinc.akun;
 
-public class BadgeListModel {
+public class Badge {
 
     private int imageId;
 
-    public BadgeListModel(int imageId) {
+    public Badge(int imageId) {
         this.imageId = imageId;
     }
 

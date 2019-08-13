@@ -70,6 +70,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
         holder.location.setText( dataList.get( i ).getLokasi() );
         holder.deskripsi.setText( dataList.get( i ).getDeskripsi() );
         holder.date.setText( dataList.get( i ).getDate() );
+        holder.status.setText( dataList.get( i ).getStatus() );
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -86,12 +87,13 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
 
                     thumbnailUri[0] = (String) snapshot.child( dataList.get( i ).getImageKey() ).child( "0" ).getValue();
 
-                    Log.i( "fetch", "THUMBNAIL" );
+                    if (context != null) {
 
-                    GlideApp.with( context )
-                            .load( thumbnailUri[0] )
-                            .centerCrop()
-                            .into( holder.foto );
+                        GlideApp.with( context )
+                                .load( thumbnailUri[0] )
+                                .centerCrop()
+                                .into( holder.foto );
+                    }
                 }
 
 
@@ -116,6 +118,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
         private TextView deskripsi;
         private TextView date;
         private ImageView foto;
+        private TextView status;
 
 
         public RecentCardViewViewHolder(@NonNull View itemView, Context theContext) {
@@ -126,6 +129,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
             deskripsi = (TextView) itemView.findViewById( R.id.tv_description );
             date = (TextView) itemView.findViewById( R.id.tv_time );
             foto = (ImageView) itemView.findViewById( R.id.iv_foto );
+            status = (TextView) itemView.findViewById( R.id.tv_status );
         }
     }
 

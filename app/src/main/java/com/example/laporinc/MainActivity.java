@@ -8,13 +8,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.laporinc.akun.AkunFragment;
 import com.example.laporinc.lapor.LaporActivity;
+import com.example.laporinc.laporansaya.LaporanActivity;
 import com.example.laporinc.recent.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_PROCESSED = "processed";
+    public static final String STATUS_DECLINED = "declined";
 
     private BottomNavigationView bottomNavigationView;
 
@@ -171,6 +177,10 @@ public class MainActivity extends AppCompatActivity {
         void getPosts();
     }
 
+    public  void showReports(View view){
+        Intent intent = new Intent( MainActivity.this, LaporanActivity.class );
+        startActivity( intent );
+    }
 }
 
 

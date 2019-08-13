@@ -1,5 +1,6 @@
 package com.example.laporinc.akun;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.laporinc.R;
+import com.example.laporinc.laporansaya.LaporanActivity;
 
 import java.util.ArrayList;
 
@@ -63,4 +65,6 @@ public class AkunFragment extends Fragment {
 
         badgeListAdapter.notifyDataSetChanged();
     }
+
+
 }

@@ -12,6 +12,9 @@
 
     <style name="ReportDetailTheme" parent="Theme.AppCompat.Light"></style>
 
+    <style name="LaporanTheme" parent="Theme.AppCompat.Light"></style>
+
+
     <style name="HomeTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="contentInsetStart">0dp</item>
         <item name="contentInsetEnd">0dp</item>

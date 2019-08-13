@@ -15,9 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".laporansaya.LaporanActivity"
+            android:label="Laporan Saya"
+            android:theme="@style/LaporanTheme"/>
+        <activity
             android:name=".reportdetail.ReportDetailActivity"
-            android:theme="@style/ReportDetailTheme"
-            android:label=" "></activity>
+            android:label=" "
+            android:theme="@style/ReportDetailTheme" />
         <activity
             android:name=".user.DaftarActivity"
             android:theme="@style/MainActivityTheme" />
@@ -56,9 +60,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/MainActivityTheme"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/MainActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
