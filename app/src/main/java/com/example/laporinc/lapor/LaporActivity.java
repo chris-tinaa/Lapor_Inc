@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -120,7 +121,7 @@ public class LaporActivity extends AppCompatActivity {
         deskripsi = (EditText) findViewById( R.id.et_detail_laporan );
 
         imageRecyclerView = (RecyclerView) findViewById( R.id.image_list );
-        imageRecyclerView.addItemDecoration( new DividerItemDecoration( LaporActivity.this, LinearLayoutManager.HORIZONTAL ){
+        imageRecyclerView.addItemDecoration( new DividerItemDecoration( LaporActivity.this, LinearLayoutManager.HORIZONTAL ) {
             @Override
             public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
                 // Do not draw the divider
@@ -190,7 +191,7 @@ public class LaporActivity extends AppCompatActivity {
                 } ).show( getSupportFragmentManager() );
 
 
-        // pick image + tambahkan gambar ke recycler view ketika tombol "tambah gambar" onclik
+        // pick image + tambahkan gambar ke recycler view ketika tombol "tambah gambar" onclick
         add_image = (RelativeLayout) findViewById( R.id.rl_add_image );
         add_image.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -290,12 +291,10 @@ public class LaporActivity extends AppCompatActivity {
         } ) );
 
 
-
         databaseReference.child( "posts" ).addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 order = snapshot.getChildrenCount() * -1;
-
 
 
             }
@@ -555,11 +554,15 @@ public class LaporActivity extends AppCompatActivity {
                 geocoder = new Geocoder( getApplicationContext(), Locale.getDefault() );
 
                 try {
-                    List<Address> listAddresses = geocoder.getFromLocation( lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), 1 );
 
-                    if (listAddresses != null && listAddresses.size() > 0) {
-                       if (listAddresses.get( 0 ).getAddressLine( 0 ) != null) {
-                            address = listAddresses.get( 0 ).getAddressLine( 0 );
+                    if (lastKnownLocation != null) {
+
+                        List<Address> listAddresses = geocoder.getFromLocation( lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), 1 );
+
+                        if (listAddresses != null && listAddresses.size() > 0) {
+                            if (listAddresses.get( 0 ).getAddressLine( 0 ) != null) {
+                                address = listAddresses.get( 0 ).getAddressLine( 0 );
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -593,24 +596,74 @@ public class LaporActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        new AlertDialog.Builder( LaporActivity.this )
-                .setIcon( android.R.drawable.ic_dialog_alert )
-                .setTitle( "Kembali" )
-                .setMessage( "Apakah anda ingin membatalkan laporan?" )
-                .setNegativeButton( "Tidak", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        showDialog();
 
-                    }
-                } )
-                .setPositiveButton( "Ya", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+//        new AlertDialog.Builder( LaporActivity.this )
+//                .setIcon( android.R.drawable.ic_dialog_alert )
+//                .setTitle( "Kembali" )
+//                .setMessage( "Apakah anda ingin membatalkan laporan?" )
+//                .setNegativeButton( "Tidak", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                    }
+//                } )
+//                .setPositiveButton( "Ya", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                        finish();
+//                    }
+//                } )
+//                .show();
+    }
 
-                        finish();
-                    }
-                } )
-                .show();
+
+    private void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder( LaporActivity.this );
+
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_alert, null);
+        builder.setView(dialogView);
+        builder.setCancelable(true);
+        //dialog.setIcon(R.mipmap.ic_launcher);
+        //dialog.setTitle(" ");
+
+
+        builder.setPositiveButton("Ya", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        builder.setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+
+
+        final AlertDialog dialog = builder.create();
+
+
+        //2. now setup to change color of the button
+        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg0) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor( "#4593EE" ));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor( "#4593EE" ));
+
+            }
+        });
+        dialog.show();
+
+
+
     }
 
 
@@ -637,13 +690,22 @@ public class LaporActivity extends AppCompatActivity {
     public void lapor(View view) {
 
         intent.putExtra( "uploading", "true" );
-        Log.i( "order", Long.toString( order ));
+        Log.i( "order", Long.toString( order ) );
 
         //showProgressDialog();
         progressBar.setVisibility( View.VISIBLE );
+        progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP );
         getWindow().setFlags( WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE );
 
+        imageRecyclerView.addOnItemTouchListener( new RecyclerView.SimpleOnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                // true: consume touch event
+                // false: dispatch touch event
+                return true;
+            }
+        } );
 
 
         // jika deskripsi tidak diisi
@@ -665,7 +727,7 @@ public class LaporActivity extends AppCompatActivity {
         //status = "unverified";
         //key = databaseReference.push().getKey();
 
-       imageKey = databaseReference.push().getKey();
+        imageKey = databaseReference.push().getKey();
 
         LaporActivity activity = new LaporActivity();
 //        OnUploadFinishListener mListener = new OnUploadFinishCallback();

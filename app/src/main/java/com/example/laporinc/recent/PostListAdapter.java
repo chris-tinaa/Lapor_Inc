@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.laporinc.MainActivity;
 import com.example.laporinc.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -70,11 +71,18 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
         holder.location.setText( dataList.get( i ).getLokasi() );
         holder.deskripsi.setText( dataList.get( i ).getDeskripsi() );
         holder.date.setText( dataList.get( i ).getDate() );
+        holder.jumlahKomentar.setText( dataList.get( i ).getJumlahKomentar() );
+
         holder.status.setText( dataList.get( i ).getStatus() );
+        if (dataList.get( i ).getStatus().equals( MainActivity.STATUS_PROCESSED ) ){
+            holder.status.setBackgroundResource( R.drawable.processed_border );
+        } else if (dataList.get( i ).getStatus().equals( MainActivity.STATUS_DECLINED ) ){
+            holder.status.setBackgroundResource( R.drawable.declined_border );
+        } else if (dataList.get( i ).getStatus().equals( MainActivity.STATUS_PENDING ) ){
+            holder.status.setBackgroundResource( R.drawable.pending_border );
+        }
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        final Bitmap[] bitmap = new Bitmap[1];
 
         final String[] thumbnailUri = new String[1];
 
@@ -119,6 +127,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
         private TextView date;
         private ImageView foto;
         private TextView status;
+        private TextView jumlahKomentar;
 
 
         public RecentCardViewViewHolder(@NonNull View itemView, Context theContext) {
@@ -130,6 +139,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.Recent
             date = (TextView) itemView.findViewById( R.id.tv_time );
             foto = (ImageView) itemView.findViewById( R.id.iv_foto );
             status = (TextView) itemView.findViewById( R.id.tv_status );
+            jumlahKomentar = (TextView) itemView.findViewById( R.id.tv_comment );
         }
     }
 

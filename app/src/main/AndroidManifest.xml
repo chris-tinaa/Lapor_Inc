@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+
+
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/logo_icon"
@@ -14,10 +17,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+
+        <activity android:name=".intro.IntroActivity"
+            android:label="@string/app_intro"
+            android:theme="@style/IntroTheme"></activity>
+        <activity
+            android:name=".badgedetail.BadgeActivity"
+            android:theme="@style/GridBadgeTheme" />
         <activity
             android:name=".laporansaya.LaporanActivity"
             android:label="Laporan Saya"
-            android:theme="@style/LaporanTheme"/>
+            android:theme="@style/LaporanTheme" />
         <activity
             android:name=".reportdetail.ReportDetailActivity"
             android:label=" "
@@ -69,6 +80,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

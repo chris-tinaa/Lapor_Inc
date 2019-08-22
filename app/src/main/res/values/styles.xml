@@ -14,6 +14,11 @@
 
     <style name="LaporanTheme" parent="Theme.AppCompat.Light"></style>
 
+    <style name="GridBadgeTheme" parent="Theme.AppCompat.Light"></style>
+
+    <style name="IntroTheme" parent="Theme.AppCompat.NoActionBar"/>
+
+
 
     <style name="HomeTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="contentInsetStart">0dp</item>

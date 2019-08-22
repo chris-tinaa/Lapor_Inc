@@ -35,17 +35,17 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginRight="16dp">
 
-                    <ImageView
+                    <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/iv_profilepic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/profilepic" />
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/placeholder_girl" />
 
                     <TextView
-                        android:id="@+id/tv_nama"
+                        android:id="@+id/tv_nama_h"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="26dp"
+                        android:layout_marginLeft="12dp"
                         android:layout_toRightOf="@id/iv_profilepic"
                         android:text="Julian Rahman"
                         android:textColor="@color/white"
@@ -70,15 +70,32 @@
                     android:textColor="@color/white"
                     android:textSize="12sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:orientation="horizontal"
                     android:layout_marginTop="2dp"
-                    android:text="130 p"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tv_point_h"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text=" p"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
                 <Button
                     android:layout_width="wrap_content"
@@ -135,7 +152,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingRight="50dp"
-                        android:clipToPadding="false" />
+                        android:clipToPadding="false"
+                        tools:listitem="@layout/badge_item"/>
 
                     <Button
                         android:layout_centerVertical="true"
@@ -149,7 +167,8 @@
                         android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="12sp"
-                        android:layout_alignParentRight="true"/>
+                        android:layout_alignParentRight="true"
+                        android:onClick="showAllBadges"/>
 
                 </RelativeLayout>
             </RelativeLayout>

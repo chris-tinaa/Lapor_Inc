@@ -1,6 +1,7 @@
 package com.example.laporinc.recent;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.laporinc.MainActivity;
 import com.example.laporinc.R;
+import com.example.laporinc.reportdetail.Comment;
 import com.example.laporinc.reportdetail.ReportDetailActivity;
 import com.example.laporinc.user.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,6 +49,7 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
     private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
     private ArrayList<String> keys;
+    private ArrayList<String> imageKeys;
     private String namaUser;
     private int poin;
     private ArrayList<Post> posts;
@@ -78,6 +81,7 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
         mAuth = FirebaseAuth.getInstance();
         progressBar = (ProgressBar) view.findViewById( R.id.progressBar );
         keys = new ArrayList<>();
+        imageKeys = new ArrayList<>();
         recyclerView = (RecyclerView) view.findViewById( R.id.recyclerView );
         posts = new ArrayList<>();
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById( R.id.swipeRefreshLayout );
@@ -90,6 +94,8 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                 Log.i( Integer.toString( position ), keys.get( position ) );
 
                 Intent intent = new Intent( getActivity(), ReportDetailActivity.class );
+                intent.putExtra( "postKey", keys.get( position ) );
+                intent.putExtra( "imageKey", imageKeys.get( position ) );
                 startActivity( intent );
             }
         };
@@ -145,9 +151,9 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                 } else if (msg.what == 2) {
                     progressBar.setVisibility( View.GONE );
                     adapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
+                    swipeRefreshLayout.setRefreshing( false );
                 } else if (msg.what == 3) {
-                    Toast.makeText( getActivity(), "Sudah di akhir halaman", Toast.LENGTH_SHORT ).show();
+                    //Toast.makeText( getActivity(), "Sudah di akhir halaman", Toast.LENGTH_SHORT ).show();
                 }
 
             }
@@ -191,6 +197,8 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
 
 
                     progressBar.setVisibility( View.VISIBLE );
+                    progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP);
+
 
 
                     databaseReference.child( "posts" ).orderByChild( "order" ).startAt( oldestPost ).limitToFirst( 5 ).addListenerForSingleValueEvent( new ValueEventListener() {
@@ -221,17 +229,20 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                                         String status = post.getStatus();
                                         String imageKey = post.getImageKey();
                                         Long order = post.getOrder();
+                                        String jumlahKomentar = post.getJumlahKomentar();
 
                                         oldestPost = post.getOrder();
 
-                                        if (status.equals(MainActivity.STATUS_PROCESSED  ) ) {
-                                            postItem = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
+                                        if (status.equals( MainActivity.STATUS_PROCESSED )) {
+
+                                            postItem = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order, jumlahKomentar );
                                             posts.add( postItem );
                                             keys.add( key );
+                                            imageKeys.add( imageKey );
                                         }
                                     }
 
-                                    if (oldestPost == 0){
+                                    if (oldestPost == 0) {
                                         Message message = new Message();
                                         message.what = 3;
                                         //message.arg1 = i;
@@ -293,6 +304,7 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
     public void getPosts() {
 
         progressBar.setVisibility( View.VISIBLE );
+        progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP);
 
 
         databaseReference.child( "posts" ).orderByChild( "order" ).limitToFirst( 5 ).addValueEventListener( new ValueEventListener() {
@@ -306,6 +318,7 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                     @Override
                     public void run() {
                         keys.clear();
+                        imageKeys.clear();
                         posts.clear();
 
                         Log.e( "Count ", "" + snapshot.getChildrenCount() );
@@ -313,6 +326,7 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                         for (DataSnapshot postSnapshot : snapshot.getChildren()) {
 
                             Post post = postSnapshot.getValue( Post.class );
+
 
                             String key = postSnapshot.getKey();
                             String idPelapor = post.getIdPelapor();
@@ -323,17 +337,22 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                             String status = post.getStatus();
                             String imageKey = post.getImageKey();
                             Long order = post.getOrder();
-                            //String thumbnailUri = post.getThumbnail();
+                            String jumlahKomentar = post.getJumlahKomentar();
 
                             oldestPost = post.getOrder();
 
-                            if (status.equals(MainActivity.STATUS_PROCESSED  ) ) {
+                            if (status.equals( MainActivity.STATUS_PROCESSED )) {
 
-                                post = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
+                                post = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order, jumlahKomentar );
                                 posts.add( post );
                                 keys.add( key );
+                                imageKeys.add( imageKey );
+
                             }
+
+
                         }
+
 
                         Message message = new Message();
                         message.what = 2;
@@ -371,7 +390,6 @@ public class HomeFragment extends Fragment implements PostListAdapter.ItemClickL
                         //homeFragment.setNamaUser( user.getNama() );
                         namaUser = user.getNama();
                         poin = user.getPoin();
-
 
 
                         Message message = new Message();

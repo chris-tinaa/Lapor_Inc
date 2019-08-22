@@ -35,7 +35,7 @@ public class UploadingInformationThread implements Runnable {
 //                lock.wait();
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        Post post = new Post( lokasiKejadian, deskripsiKejadian, waktuKejadian, idUser, jenisPelanggaran, status, imageKey, order );
+        Post post = new Post( lokasiKejadian, deskripsiKejadian, waktuKejadian, idUser, jenisPelanggaran, status, imageKey, order, "0" );
         databaseReference.child( "posts" ).child( postKey ).setValue( post );
 
 //            } catch (InterruptedException e) {

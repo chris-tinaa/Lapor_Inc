@@ -28,16 +28,16 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/profilepic" />
+                android:src="@drawable/placeholder_girl" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="25dp"
+                android:layout_marginLeft="12dp"
                 android:orientation="vertical">
 
                 <TextView

@@ -2,17 +2,17 @@ package com.example.laporinc.reportdetail;
 
 public class ImageModel {
 
-    private int image;
+    private String imageUri;
 
-    public ImageModel(int image) {
-        this.image = image;
+    public ImageModel(String imageUri) {
+        this.imageUri = imageUri;
     }
 
-    public int getImage() {
-        return image;
+    public String getImageUri() {
+        return imageUri;
     }
 
-    public void setImage(int image) {
-        this.image = image;
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
     }
 }

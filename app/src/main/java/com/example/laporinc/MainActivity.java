@@ -1,6 +1,9 @@
 package com.example.laporinc;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -9,9 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.laporinc.akun.AkunFragment;
+import com.example.laporinc.badgedetail.BadgeActivity;
+import com.example.laporinc.intro.IntroActivity;
 import com.example.laporinc.lapor.LaporActivity;
 import com.example.laporinc.laporansaya.LaporanActivity;
 import com.example.laporinc.recent.HomeFragment;
@@ -40,6 +46,53 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
+
+
+        //=============================================================================================
+        //  Declare a new thread to do a preference check
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //  Initialize SharedPreferences
+                SharedPreferences getPrefs = PreferenceManager
+                        .getDefaultSharedPreferences(getBaseContext());
+
+                //  Create a new boolean and preference and set it to true
+                boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
+
+                //  If the activity has never started before...
+                if (isFirstStart) {
+
+                    //  Launch app intro
+                    final Intent i = new Intent(MainActivity.this, IntroActivity.class);
+
+                    runOnUiThread(new Runnable() {
+                        @Override public void run() {
+                            startActivity(i);
+                        }
+                    });
+
+                    //  Make a new preferences editor
+                    SharedPreferences.Editor e = getPrefs.edit();
+
+                    //  Edit preference to make it false because we don't want this to run again
+                    e.putBoolean("firstStart", false);
+
+                    //  Apply changes
+                    e.apply();
+                }
+            }
+        });
+
+        // Start the thread
+        t.start();
+
+        //=============================================================================================
+
+
+
+
+
 
         intent = new Intent();
 
@@ -135,7 +188,35 @@ public class MainActivity extends AppCompatActivity {
 
             case 1:
                 //laporan baru
-                Toast.makeText( this, "Laporan berhasil dibuat", Toast.LENGTH_SHORT ).show();
+                //Toast.makeText( this, "Laporan berhasil dibuat", Toast.LENGTH_SHORT ).show();
+
+                /**
+                 * Initiate Custom Dialog
+                 */
+                final Dialog dialog = new Dialog(MainActivity.this);
+                dialog.setContentView(R.layout.dialog_laporan_terkirim);
+                //dialog.setTitle("");
+
+                /**
+                 * Mengeset komponen dari custom dialog
+                 */
+//                TextView text = (TextView) dialog.findViewById(R.id.tv_desc);
+//                text.setText("TWOH's Engineering custom dialog sample");
+//                ImageView image = (ImageView) dialog.findViewById(R.id.iv_icon);
+//                image.setImageResource(R.mipmap.ic_launcher);
+
+                Button dialogButton = (Button) dialog.findViewById(R.id.button_ok);
+                /**
+                 * Jika tombol diklik, tutup dialog
+                 */
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
 
                 intent = data;
 
@@ -180,6 +261,11 @@ public class MainActivity extends AppCompatActivity {
     public  void showReports(View view){
         Intent intent = new Intent( MainActivity.this, LaporanActivity.class );
         startActivity( intent );
+    }
+
+    public void showAllBadges(View view){
+        Intent intent = new Intent( MainActivity.this, BadgeActivity.class );
+        startActivity(intent);
     }
 }
 

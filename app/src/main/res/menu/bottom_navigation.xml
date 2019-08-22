@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/item_recent"
         android:enabled="true"
-        android:icon="@drawable/home"
+        android:icon="@drawable/ic_home_24dp"
         app:showAsAction="ifRoom"
         android:title="Recent" />
     <item android:id="@+id/item_lapor"
         android:enabled="true"
-        android:icon="@drawable/lapor"
+        android:icon="@drawable/ic_add_circle_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Lapor!" />
     <item android:id="@+id/item_akun"
         android:enabled="true"
-        android:icon="@drawable/akun"
+        android:icon="@drawable/ic_person_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Akun"
         />

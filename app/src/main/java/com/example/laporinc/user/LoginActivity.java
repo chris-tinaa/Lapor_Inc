@@ -3,6 +3,7 @@ package com.example.laporinc.user;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -72,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //showProgressDialog();
         progressBar.setVisibility( View.VISIBLE );
+        progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP);
         getWindow().setFlags( WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 

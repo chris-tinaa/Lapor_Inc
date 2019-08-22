@@ -2,20 +2,23 @@ package com.example.laporinc.reportdetail;
 
 public class Comment {
 
-    private String nama, waktu, isiKomentar;
+    private String identitas, waktu, isiKomentar;
 
-    public Comment(String nama, String waktu, String isiKomentar) {
-        this.nama = nama;
+    public Comment(String identitas, String waktu, String isiKomentar) {
+        this.identitas= identitas;
         this.waktu = waktu;
         this.isiKomentar = isiKomentar;
     }
 
-    public String getNama() {
-        return nama;
+    public Comment() {
     }
 
-    public void setNama(String nama) {
-        this.nama = nama;
+    public String getIdentitas() {
+        return identitas;
+    }
+
+    public void setIdentitas(String identitas) {
+        this.identitas = identitas;
     }
 
     public String getWaktu() {

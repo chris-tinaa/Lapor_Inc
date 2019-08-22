@@ -16,12 +16,12 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:focusableInTouchMode="true">
 
             <android.support.v4.view.ViewPager
-                android:layout_marginTop="16dp"
                 android:id="@+id/view_pager"
+                android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="220dp" />
 
@@ -34,11 +34,12 @@
                 android:padding="16dp" />
 
             <TextView
+                android:id="@+id/tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/view_pager"
                 android:layout_marginTop="18dp"
-                android:text="1 hour ago"
+                android:text=" "
                 android:textColor="#757575"
                 android:textSize="12sp" />
 
@@ -77,7 +78,7 @@
                     android:gravity="center"
                     android:lines="1"
                     android:maxLines="1"
-                    android:text="Gedung Tokong Nanas"
+                    android:text=" "
                     android:textColor="#757575"
                     android:textSize="12sp" />
 
@@ -90,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_location"
                 android:layout_marginTop="20dp"
-                android:text="Sed vel ultrices tortor, sed mol estie risus. Fusce ut odio condimentum, accumsan nisl vitae, ornare purus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sed feugiat nisl."
+                android:text=" "
                 android:textColor="#000000" />
 
             <TextView
@@ -114,7 +115,7 @@
                 android:maxLines="1"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:text="Tertip Parkir"
+                android:text=" "
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -127,7 +128,7 @@
                 android:layout_marginTop="20dp"
                 android:drawableLeft="@drawable/ic_comment_black_24dp"
                 android:drawablePadding="4dp"
-                android:text="Komentar 4"
+                android:text="Komentar "
                 android:textColor="#000000"
                 android:textSize="12sp" />
 
@@ -181,6 +182,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_send_blue_24dp"
             android:layout_alignParentRight="true"
+            android:onClick="submitComment"
             />
 
         <View
@@ -213,6 +215,14 @@
             android:checked="false" />
 
     </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
 
 
 </RelativeLayout>

@@ -13,12 +13,13 @@ public class Post {
     private String jenisPelanggaran;
     private String status;
     private String imageKey;
+    private String jumlahKomentar;
     private long order;
 
     public Post() {
     }
 
-    public Post(String lokasi, String deskripsi, String date, String idPelapor, String jenisPelanggaran, String status, String imageKey, long order) {
+    public Post(String lokasi, String deskripsi, String date, String idPelapor, String jenisPelanggaran, String status, String imageKey, long order, String jumlahKomentar) {
         this.lokasi = lokasi;
         this.deskripsi = deskripsi;
         this.date = date;
@@ -27,6 +28,15 @@ public class Post {
         this.status = status;
         this.imageKey = imageKey;
         this.order = order;
+        this.jumlahKomentar = jumlahKomentar;
+    }
+
+    public String getJumlahKomentar() {
+        return jumlahKomentar;
+    }
+
+    public void setJumlahKomentar(String jumlahKomentar) {
+        this.jumlahKomentar = jumlahKomentar;
     }
 
     public long getOrder() {

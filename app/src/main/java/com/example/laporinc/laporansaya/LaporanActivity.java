@@ -1,6 +1,7 @@
 package com.example.laporinc.laporansaya;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -37,6 +38,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
+import static android.view.View.inflate;
 
 public class LaporanActivity extends AppCompatActivity {
 
@@ -47,6 +49,7 @@ public class LaporanActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
     private ArrayList<String> keys;
+    private ArrayList<String> imageKeys;
     private ArrayList<Post> posts;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -69,6 +72,7 @@ public class LaporanActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         progressBar = (ProgressBar) findViewById( R.id.progressBar2 );
         keys = new ArrayList<>();
+        imageKeys = new ArrayList<>();
         recyclerView = (RecyclerView) findViewById( R.id.rv_laporan );
         posts = new ArrayList<>();
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById( R.id.swipeRefreshLayout2 );
@@ -80,6 +84,8 @@ public class LaporanActivity extends AppCompatActivity {
                 Log.i( Integer.toString( pos ), keys.get( pos ) );
 
                 Intent intent = new Intent( LaporanActivity.this, ReportDetailActivity.class );
+                intent.putExtra( "postKey", keys.get( pos ) );
+                intent.putExtra( "imageKey", imageKeys.get( pos ) );
                 startActivity( intent );
             }
         };
@@ -103,6 +109,8 @@ public class LaporanActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         userId = user.getUid();
 
+        getPoin();
+
         // mengambil data postingan
         getPosts();
 
@@ -116,7 +124,7 @@ public class LaporanActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing( false );
                 } else if (msg.what == 3) {
-                    Toast.makeText( LaporanActivity.this, "Sudah di akhir halaman", Toast.LENGTH_SHORT ).show();
+                    //Toast.makeText( LaporanActivity.this, "Sudah di akhir halaman", Toast.LENGTH_SHORT ).show();
                 }
 
             }
@@ -160,6 +168,7 @@ public class LaporanActivity extends AppCompatActivity {
 
 
                     progressBar.setVisibility( View.VISIBLE );
+                    progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP);
 
 
                     databaseReference.child( "posts" ).orderByChild( "order" ).startAt( oldestPost ).limitToFirst( 5 ).addListenerForSingleValueEvent( new ValueEventListener() {
@@ -191,13 +200,22 @@ public class LaporanActivity extends AppCompatActivity {
                                         String status = post.getStatus();
                                         String imageKey = post.getImageKey();
                                         Long order = post.getOrder();
+                                        String jumlahKomentar = post.getJumlahKomentar();
+
 
                                         oldestPost = post.getOrder();
 
-                                        postItem = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
-                                        posts.add( postItem );
-                                        keys.add( key );
 
+                                        if (idPelapor.equals( userId )) {
+
+                                            postItem = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order, jumlahKomentar );
+                                            posts.add( postItem );
+                                            keys.add( key );
+                                            imageKeys.add( imageKey );
+
+
+
+                                        }
                                     }
 
                                     if (oldestPost == 0) {
@@ -239,13 +257,13 @@ public class LaporanActivity extends AppCompatActivity {
 
         } );
 
-
     }
 
 
     public void getPosts() {
 
         progressBar.setVisibility( View.VISIBLE );
+        progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP);
 
 
         databaseReference.child( "posts" ).orderByChild( "order" ).limitToFirst( 5 ).addValueEventListener( new ValueEventListener() {
@@ -259,6 +277,7 @@ public class LaporanActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         keys.clear();
+                        imageKeys.clear();
                         posts.clear();
 
                         Log.e( "Count ", "" + snapshot.getChildrenCount() );
@@ -270,7 +289,7 @@ public class LaporanActivity extends AppCompatActivity {
 
 
                             String key = postSnapshot.getKey();
-                            String idPelapor = post.getIdPelapor();
+                            final String idPelapor = post.getIdPelapor();
                             String lokasi = post.getLokasi();
                             String deskripsi = post.getDeskripsi();
                             String date = post.getDate();
@@ -278,20 +297,19 @@ public class LaporanActivity extends AppCompatActivity {
                             String status = post.getStatus();
                             String imageKey = post.getImageKey();
                             Long order = post.getOrder();
+                            String jumlahKomentar = post.getJumlahKomentar();
                             //String thumbnailUri = post.getThumbnail();
 
                             oldestPost = post.getOrder();
 
-                            Log.i( "outside if", status );
-                            Log.i( "STATUS_PROCESSED", MainActivity.STATUS_PROCESSED );
+                            if (idPelapor.equals( userId )) {
 
+                                post = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order, jumlahKomentar );
+                                posts.add( post );
+                                keys.add( key );
+                                imageKeys.add( imageKey );
 
-                            Log.i( "inside if", status );
-
-                            post = new Post( lokasi, deskripsi, date, idPelapor, jenisPelanggaran, status, imageKey, order );
-                            posts.add( post );
-                            keys.add( key );
-
+                            }
                         }
 
                         Message message = new Message();
@@ -314,6 +332,61 @@ public class LaporanActivity extends AppCompatActivity {
 
     }
 
+    public void getPoin() {
+
+        progressBar.setVisibility( View.VISIBLE );
+        progressBar.getIndeterminateDrawable().setColorFilter( Color.parseColor( "#4593EE" ), android.graphics.PorterDuff.Mode.SRC_ATOP);
+
+
+        databaseReference.child( "posts" ).addValueEventListener( new ValueEventListener() {
+
+            Post post;
+
+            @Override
+            public void onDataChange(final DataSnapshot snapshot) {
+
+                new Thread( new Runnable() {
+                    @Override
+                    public void run() {
+                        int processed = 0;
+
+                        Log.e( "Count ", "" + snapshot.getChildrenCount() );
+
+                        for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+
+                            Post post = postSnapshot.getValue( Post.class );
+                            //Log.e( "Get Data", post.getLokasi());
+
+                            final String idPelapor = post.getIdPelapor();
+                            String status = post.getStatus();
+                            //String thumbnailUri = post.getThumbnail();
+
+                            if (idPelapor.equals( userId )) {
+
+                                if (status.equals( MainActivity.STATUS_PROCESSED )) {
+                                    processed++;
+                                }
+                            }
+                        }
+
+                        addPoint( processed );
+
+                    }
+
+                } ).start();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        } );
+
+
+    }
+
+
 
     // mengatur action bar
     @Override
@@ -330,5 +403,11 @@ public class LaporanActivity extends AppCompatActivity {
         onBackPressed();
 
         return super.onOptionsItemSelected( item );
+    }
+
+    private void addPoint(int jml) {
+
+        databaseReference.child( "users" ).child( userId ).child( "poin" ).setValue( jml * 10 );
+
     }
 }
